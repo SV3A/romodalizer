@@ -2,24 +2,27 @@
 #define MODALANALYSISHEADDEF
 
 #include <iostream>
-#include "Eigen/Eigenvalues"
+#include <cmath>
+#include "Eigen/Dense"
+
+typedef Eigen::Matrix<double, 5, Eigen::Dynamic> ElementsMatrix;
 
 class ModalAnalysis
 {
   private:
     unsigned int numEl;    // Number of elements
     unsigned int numDof;   // Number of degress of freedom
-    Eigen::MatrixXf *mesh; // Pointer to mesh
+    //Eigen::Matrix<double,5,Eigen::Dynamic> *mesh;  // Pointer to mesh
 
     // Matrices
-    Eigen::MatrixXf mass;
-    Eigen::MatrixXf damp;
-    Eigen::MatrixXf stiff;
+    Eigen::MatrixXd M;
+    Eigen::MatrixXd D;
+    Eigen::MatrixXd K;
 
-    void buildMassMatrix();
+    void buildMassMatrix(const ElementsMatrix &elements);
 
   public:
-    ModalAnalysis(Eigen::MatrixXf &mesh);
+    ModalAnalysis(const ElementsMatrix &elements);
 
     void printInfo();
 };
