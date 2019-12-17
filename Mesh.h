@@ -1,5 +1,5 @@
-#ifndef MESHHEADDEF
-#define MESHHEADDEF
+#ifndef MESH_H
+#define MESH_H
 
 #include <iostream>
 #include "Eigen/Dense"

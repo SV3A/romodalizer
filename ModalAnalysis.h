@@ -1,28 +1,38 @@
-#ifndef MODALANALYSISHEADDEF
-#define MODALANALYSISHEADDEF
+#ifndef MODALANALYSIS_H
+#define MODALANALYSIS_H
 
 #include <iostream>
 #include <cmath>
 #include "Eigen/Dense"
+#include "Eigen/Sparse"
+#include "Eigen/Eigenvalues"
 
+typedef Eigen::Triplet<double> Triplet;
 typedef Eigen::Matrix<double, 5, Eigen::Dynamic> ElementsMatrix;
 
 class ModalAnalysis
 {
   private:
-    unsigned int numEl;    // Number of elements
-    unsigned int numDof;   // Number of degress of freedom
-    //Eigen::Matrix<double,5,Eigen::Dynamic> *mesh;  // Pointer to mesh
+    unsigned int numEl;  // Number of elements
+    unsigned int numDof; // Number of degress of freedom
+    float omega;         // Angular velocity [rad/s]
 
-    // Matrices
+    // Global matrices
     Eigen::MatrixXd M;
     Eigen::MatrixXd G;
     Eigen::MatrixXd K;
 
+    // State matrices
+    Eigen::SparseMatrix<double> A, B;
+
     void buildShaftMatrices(const ElementsMatrix &elements);
 
+    void buildStateSpace();
+
   public:
-    ModalAnalysis(const ElementsMatrix &elements);
+    ModalAnalysis(double omega, const ElementsMatrix &elements);
+
+    void solve();
 
     void printInfo();
 };

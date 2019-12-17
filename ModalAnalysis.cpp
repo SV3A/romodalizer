@@ -1,16 +1,21 @@
 #include "ModalAnalysis.h"
 
 // Constructor
-ModalAnalysis::ModalAnalysis(const ElementsMatrix &elements)
+ModalAnalysis::ModalAnalysis(double omega, const ElementsMatrix &elements)
 {
+  // Set angular velocity
+  this->omega = omega;
+
   // Get number of elements and derrive from it the number of D.O.F.s
   numEl  = elements.cols();
   numDof = (numEl + 1)*4;
 
-  // Set size of system matrices
+  // Set size of system matrices and state matrices
   M.resize(numDof, numDof);
   G.resize(numDof, numDof);
   K.resize(numDof, numDof);
+  A.resize(numDof*2, numDof*2);
+  B.resize(numDof*2, numDof*2);
 
   // Build shaft matrices
   buildShaftMatrices(elements);
@@ -111,6 +116,42 @@ void ModalAnalysis::buildShaftMatrices(const ElementsMatrix &elements)
 
     a += 4; b += 4;
   }
+}
+
+
+void ModalAnalysis::buildStateSpace(){
+
+  std::vector<Triplet> aTripList, bTripList;
+
+  for (int i = 0; i < numDof; i++) {
+    for (int j = 0; j < numDof; j++) {
+      if (M(i, j) != 0.0)  bTripList.push_back(Triplet(i, j, M(i,j)));
+      if (G(i, j) != 0.0)  aTripList.push_back(Triplet(i, j, omega*G(i,j)));
+      if (K(i, j) != 0.0) {
+        aTripList.push_back(Triplet(i       , j+numDof, -K(i,j)));
+        aTripList.push_back(Triplet(i+numDof, j       ,  K(i,j)));
+        bTripList.push_back(Triplet(i+numDof, j+numDof,  K(i,j)));
+      }
+    }
+  }
+
+  // Populate sparse matrices
+  A.setFromTriplets(aTripList.begin(), aTripList.end());
+  B.setFromTriplets(bTripList.begin(), bTripList.end());
+}
+
+
+// Generalized EVP: A*phi_i = lambda_i*B*phi_i
+void ModalAnalysis::solve()
+{
+  Eigen::GeneralizedEigenSolver<Eigen::MatrixXd> ges;
+
+  buildStateSpace();
+
+  ges.compute(A, B);
+
+  //std::cout << "The (complex) generalzied eigenvalues are (alphas./beta): "
+       //<< ges.eigenvalues().transpose() << std::endl;
 }
 
 

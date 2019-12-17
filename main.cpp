@@ -18,9 +18,11 @@ int main(int argc, char *argv[])
   mesh->setDensity(2770.0);
   mesh->setEmod((double) 69.0e9);
 
-  ModalAnalysis *modAnalysis = new ModalAnalysis(mesh->elements);
+  ModalAnalysis *modAnalysis = new ModalAnalysis(0.0f, mesh->elements);
 
   modAnalysis->printInfo();
+
+  modAnalysis->solve();
 
   // Cleanup
   delete mesh;
