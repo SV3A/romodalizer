@@ -16,10 +16,10 @@ class ModalAnalysis
 
     // Matrices
     Eigen::MatrixXd M;
-    Eigen::MatrixXd D;
+    Eigen::MatrixXd G;
     Eigen::MatrixXd K;
 
-    void buildMassMatrix(const ElementsMatrix &elements);
+    void buildShaftMatrices(const ElementsMatrix &elements);
 
   public:
     ModalAnalysis(const ElementsMatrix &elements);
