@@ -13,9 +13,9 @@ typedef Eigen::Matrix<double, 5, Eigen::Dynamic> ElementsMatrix;
 class ModalAnalysis
 {
   private:
-    unsigned int numEl;  // Number of elements
-    unsigned int numDof; // Number of degress of freedom
-    float omega;         // Angular velocity [rad/s]
+    size_t numEl;  // Number of elements
+    size_t numDof; // Number of degress of freedom
+    float omega;   // Angular velocity [rad/s]
 
     // Global matrices
     Eigen::MatrixXd M;

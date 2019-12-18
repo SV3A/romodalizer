@@ -27,15 +27,15 @@ ModalAnalysis::ModalAnalysis(double omega, const ElementsMatrix &elements)
 void ModalAnalysis::buildShaftMatrices(const ElementsMatrix &elements)
 {
   // Start- and end indices
-  unsigned int a = 0, b = 7;
+  size_t a = 0, b = 7;
 
   double l, lsq, rho, eMod, transArea, momInert, ro, ri;
   double momInertFact = M_PI/4.0;
 
   // Temp matrices
-  Eigen::MatrixXd localMLin(8,8), localMRot(8,8), localG(8,8), localK(8,8);
+  Eigen::Matrix<double, 8, 8> localMLin, localMRot, localG, localK;
 
-  for (int e = 0; e < numEl; e++) {
+  for (size_t e = 0; e < numEl; e++) {
     l    = elements(0, e);
     ro   = elements(1, e);
     ri   = elements(2, e);
@@ -106,8 +106,8 @@ void ModalAnalysis::buildShaftMatrices(const ElementsMatrix &elements)
 
 
     // Construct the global mass- and gyro matrix (of size numDof x numDof)
-    for (int i = a; i <= b; ++i) {
-      for (int j = a; j <= b; ++j) {
+    for (size_t i = a; i <= b; ++i) {
+      for (size_t j = a; j <= b; ++j) {
         M(i, j) += localMLin(i - e*4, j - e*4);
         G(i, j) +=    localG(i - e*4, j - e*4);
         K(i, j) +=    localK(i - e*4, j - e*4);
@@ -123,11 +123,11 @@ void ModalAnalysis::buildStateSpace(){
 
   std::vector<Triplet> aTripList, bTripList;
 
-  for (int i = 0; i < numDof; i++) {
-    for (int j = 0; j < numDof; j++) {
-      if (M(i, j) != 0.0)  bTripList.push_back(Triplet(i, j, M(i,j)));
-      if (G(i, j) != 0.0)  aTripList.push_back(Triplet(i, j, omega*G(i,j)));
-      if (K(i, j) != 0.0) {
+  for (size_t i = 0; i < numDof; i++) {
+    for (size_t j = 0; j < numDof; j++) {
+      if (M(i,j) != 0.0)  bTripList.push_back(Triplet(i, j, M(i,j)));
+      if (G(i,j) != 0.0)  aTripList.push_back(Triplet(i, j, omega*G(i,j)));
+      if (K(i,j) != 0.0) {
         aTripList.push_back(Triplet(i       , j+numDof, -K(i,j)));
         aTripList.push_back(Triplet(i+numDof, j       ,  K(i,j)));
         bTripList.push_back(Triplet(i+numDof, j+numDof,  K(i,j)));
@@ -151,7 +151,7 @@ void ModalAnalysis::solve()
   ges.compute(A, B);
 
   //std::cout << "The (complex) generalzied eigenvalues are (alphas./beta): "
-       //<< ges.eigenvalues().transpose() << std::endl;
+       //<< ges.eigenvalues() << std::endl;
 }
 
 
