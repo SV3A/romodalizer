@@ -144,14 +144,28 @@ void ModalAnalysis::buildStateSpace(){
 // Generalized EVP: A*phi_i = lambda_i*B*phi_i
 void ModalAnalysis::solve()
 {
+  Eigen::VectorXcd eigVals;
+  Eigen::MatrixXcd eigVects;
   Eigen::GeneralizedEigenSolver<Eigen::MatrixXd> ges;
 
+  // Create the A and B matrices in the EVP
   buildStateSpace();
 
+  // Compute solution
   ges.compute(A, B);
 
-  //std::cout << "The (complex) generalzied eigenvalues are (alphas./beta): "
-       //<< ges.eigenvalues() << std::endl;
+  // Copy solution to tmp. variables
+  eigVals  = ges.eigenvalues();
+  eigVects = ges.eigenvectors();
+
+  // Collect eigen- values and vectors in global "eigenSolution" container
+  for (size_t i = 0; i < eigVals.size(); i++) {
+    // Create tuple
+    std::tuple<std::complex<double>,Eigen::VectorXcd> eigPair(eigVals[i],
+                                                              eigVects.row(i));
+    // and append it to container
+    eigenSolution.push_back(eigPair);
+  }
 }
 
 

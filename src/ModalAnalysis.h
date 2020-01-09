@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <cmath>
+#include <tuple>
+#include <vector>
+#include <complex>
 #include "Eigen/Dense"
 #include "Eigen/Sparse"
 #include "Eigen/Eigenvalues"
@@ -24,6 +27,9 @@ class ModalAnalysis
 
     // State matrices
     Eigen::SparseMatrix<double> A, B;
+
+    // List of tuples containing eigenvector and eigenvalue pairs
+    std::vector<std::tuple<std::complex<double>, Eigen::VectorXcd>> eigenSolution;
 
     void buildShaftMatrices(const ElementsMatrix &elements);
 
