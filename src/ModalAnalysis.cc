@@ -166,6 +166,9 @@ void ModalAnalysis::solve()
     // and append it to container
     eigenSolution.push_back(eigPair);
   }
+
+  // Sort the eigen solution
+  std::sort(eigenSolution.begin(), eigenSolution.end(), util::eigSort);
 }
 
 

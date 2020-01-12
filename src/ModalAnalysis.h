@@ -6,12 +6,15 @@
 #include <tuple>
 #include <vector>
 #include <complex>
+#include <algorithm>
 #include "Eigen/Dense"
 #include "Eigen/Sparse"
 #include "Eigen/Eigenvalues"
+#include "Util.h"
 
 typedef Eigen::Triplet<double> Triplet;
 typedef Eigen::Matrix<double, 5, Eigen::Dynamic> ElementsMatrix;
+typedef std::tuple<std::complex<double>, Eigen::VectorXcd> EigTuple;
 
 class ModalAnalysis
 {
@@ -28,9 +31,6 @@ class ModalAnalysis
     // State matrices
     Eigen::SparseMatrix<double> A, B;
 
-    // List of tuples containing eigenvector and eigenvalue pairs
-    std::vector<std::tuple<std::complex<double>, Eigen::VectorXcd>> eigenSolution;
-
     void buildShaftMatrices(const ElementsMatrix &elements);
 
     void buildStateSpace();
@@ -41,6 +41,9 @@ class ModalAnalysis
     void solve();
 
     void printInfo();
+
+    // List of tuples containing eigenvector and eigenvalue pairs
+    std::vector<EigTuple> eigenSolution;
 };
 
 #endif

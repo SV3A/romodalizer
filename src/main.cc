@@ -7,10 +7,10 @@ int main(int argc, char *argv[])
 {
   // Define mesh
   double ro = 0.025*0.5;
-  Eigen::MatrixXd m(4, 5); m << 162,  88, 120,  52,  63, // Length
-                                 ro,  ro,  ro,  ro,  ro, // Outer radius
-                                0.0, 0.0, 0.0, 0.0, 0.0, // Inner radius
-                                  3,   2,   3,   1,   2; // Partition num
+  Eigen::MatrixXd m(4, 1); m << 200, // Length
+                                 ro, // Outer radius
+                                0.0, // Inner radius
+                                  4; // Partition num
 
   m.row(0) = m.row(0)*0.001; // Convert from [mm] to [m]
 
@@ -23,6 +23,14 @@ int main(int argc, char *argv[])
   modAnalysis->printInfo();
 
   modAnalysis->solve();
+
+  // Print eigenvalues
+  std::vector<EigTuple> * eigSol = & modAnalysis->eigenSolution;
+
+  std::cout << "Eigenvalues:" << std::endl;
+  for (auto const & i:*eigSol){
+    std::cout << "   " << std::get<0>(i) << std::endl;
+  }
 
   // Cleanup
   delete mesh;

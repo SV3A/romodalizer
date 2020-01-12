@@ -9,7 +9,7 @@ endif
 TARGET = ./bin
 SRCDIR = ./src
 OBJDIR = ./objs
-OBJ = main.o ModalAnalysis.o Mesh.o
+OBJ = main.o ModalAnalysis.o Mesh.o Util.o
 
 VPATH = $(SRCDIR):$(OBJDIR)
 
@@ -27,7 +27,8 @@ $(TARGET): $(OBJ)
 	chmod go+rx $(TARGET)
 
 # Dependencies:
-main.o: Mesh.o ModalAnalysis.o
+ModalAnalysis.o: Util.o
+main.o: Mesh.o ModalAnalysis.o Util.o
 
 .PHONY: clean
 
