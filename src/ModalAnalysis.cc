@@ -1,14 +1,12 @@
 #include "ModalAnalysis.h"
 
 // Constructor
-ModalAnalysis::ModalAnalysis(double omega, const ElementsMatrix &elements)
-{
-  // Set angular velocity
+// Initializer sets number of elements and derive from it the number of
+// D.O.F.s
+ModalAnalysis::ModalAnalysis(double omega, const ElementsMatrix& elements)
+: numEl(elements.cols()), numDof((numEl+1)*4) {
+  // Angular velocity
   this->omega = omega;
-
-  // Get number of elements and derrive from it the number of D.O.F.s
-  numEl  = elements.cols();
-  numDof = (numEl + 1)*4;
 
   // Set size of system matrices and state matrices
   M.resize(numDof, numDof);
@@ -17,14 +15,30 @@ ModalAnalysis::ModalAnalysis(double omega, const ElementsMatrix &elements)
   A.resize(numDof*2, numDof*2);
   B.resize(numDof*2, numDof*2);
 
+  eigenSolution = new std::vector<EigTuple>;
+
   // Build shaft matrices
   buildShaftMatrices(elements);
 }
 
 
+// Destructor
+ModalAnalysis::~ModalAnalysis()
+{
+  // Free memory
+  M.resize(0, 0);
+  G.resize(0, 0);
+  K.resize(0, 0);
+  A.resize(0, 0);
+  B.resize(0, 0);
+
+  delete eigenSolution;
+}
+
+
 // Defines the local matrices for each shaft element and inserts the local
 // matrices into the global M, G, and K matrices.
-void ModalAnalysis::buildShaftMatrices(const ElementsMatrix &elements)
+void ModalAnalysis::buildShaftMatrices(const ElementsMatrix& elements)
 {
   // Start- and end indices
   size_t a = 0, b = 7;
@@ -119,12 +133,16 @@ void ModalAnalysis::buildShaftMatrices(const ElementsMatrix &elements)
 }
 
 
+// Buids state matrices A and B as:
+//     | omega*G -K |      | M  0 |
+// A = |    K     0 |, B = | 0  M |
 void ModalAnalysis::buildStateSpace(){
-
+  // Temporary triplet vectors for constructing the sparse state matrices
   std::vector<Triplet> aTripList, bTripList;
 
-  for (size_t i = 0; i < numDof; i++) {
-    for (size_t j = 0; j < numDof; j++) {
+  // Build triplet lists from non-zero entries in the dense global matrices
+  for (size_t i = 0; i < numDof; ++i) {
+    for (size_t j = 0; j < numDof; ++j) {
       if (M(i,j) != 0.0)  bTripList.push_back(Triplet(i, j, M(i,j)));
       if (G(i,j) != 0.0)  aTripList.push_back(Triplet(i, j, omega*G(i,j)));
       if (K(i,j) != 0.0) {
@@ -141,7 +159,7 @@ void ModalAnalysis::buildStateSpace(){
 }
 
 
-// Generalized EVP: A*phi_i = lambda_i*B*phi_i
+// Solve the generalized EVP: A*phi_i = lambda_i*B*phi_i
 void ModalAnalysis::solve()
 {
   Eigen::VectorXcd eigVals;
@@ -159,20 +177,23 @@ void ModalAnalysis::solve()
   eigVects = ges.eigenvectors();
 
   // Collect eigen- values and vectors in global "eigenSolution" container
-  for (size_t i = 0; i < eigVals.size(); i++) {
+  for (size_t i = 0; i < eigVals.size(); ++i) {
     // Create tuple
     std::tuple<std::complex<double>,Eigen::VectorXcd> eigPair(eigVals[i],
                                                               eigVects.row(i));
     // and append it to container
-    eigenSolution.push_back(eigPair);
+    eigenSolution->push_back(eigPair);
   }
 
   // Sort the eigen solution
-  std::sort(eigenSolution.begin(), eigenSolution.end(), util::eigSort);
+  std::sort(eigenSolution->begin(), eigenSolution->end(), util::eigSort);
+
+  eigVals.resize(0);
+  eigVects.resize(0,0);
 }
 
 
-void ModalAnalysis::printInfo()
+void ModalAnalysis::printInfo() const
 {
   std::cout << "Number of elements: " << numEl << std::endl;
   std::cout << "Number of DOFs: " << numDof << std::endl;

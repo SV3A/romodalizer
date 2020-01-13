@@ -8,14 +8,16 @@ class Mesh
 {
   private:
     unsigned int numEl;
-    void setGeometry(Eigen::MatrixXd & mesh);
+    void setGeometry(Eigen::MatrixXd& mesh);
 
   public:
 
     // 5xm matrix containing all info related to each element (column)
     Eigen::Matrix<double, 5, Eigen::Dynamic> elements;
 
-    Mesh(Eigen::MatrixXd &mesh);
+    Mesh(Eigen::MatrixXd& mesh);
+
+    ~Mesh();
 
     void setDensity(double rho, unsigned int element = 0);
     void setEmod(double eMod, unsigned int element = 0);

@@ -8,6 +8,12 @@ Mesh::Mesh(Eigen::MatrixXd & mesh)
 }
 
 
+Mesh::~Mesh()
+{
+  elements.resize(0, 0);
+}
+
+
 void Mesh::setDensity(double rho, unsigned int element){
   if (element != 0)
     elements(3, element) = rho;
