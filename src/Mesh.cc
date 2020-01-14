@@ -10,7 +10,6 @@ Mesh::Mesh(Eigen::MatrixXd & mesh)
 
 Mesh::~Mesh()
 {
-  elements.resize(0, 0);
 }
 
 

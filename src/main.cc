@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "ModalAnalysis.h"
 #include "Eigen/Dense"
+#include "NodeComponents.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,10 +19,27 @@ int main(int argc, char *argv[])
   mesh->setDensity(2770.0);
   mesh->setEmod((double) 69.0e9);
 
-  ModalAnalysis* modAnalysis = new ModalAnalysis(0.0f, mesh->elements);
 
+  // Setup modal analysis
+  ModalAnalysis* modAnalysis = new ModalAnalysis(0.0f, mesh->elements);
   modAnalysis->printInfo();
 
+
+  // Define machine elements
+  Eigen::Matrix4d bearing_k1; bearing_k1 << 10e9,  0.0, 0.0, 0.0,
+                                             0.0, 10e9, 0.0, 0.0,
+                                             0.0,  0.0, 0.0, 0.0,
+                                             0.0,  0.0, 0.0, 0.0;
+  Bearing* bearing1 = new Bearing(bearing_k1);
+  Disc* disc1       = new Disc(1, 0.5, 0.5);
+
+  // Mount machine elements
+  modAnalysis->addNodeComponent(1, *bearing1);
+  modAnalysis->addNodeComponent(4, *bearing1);
+  modAnalysis->addNodeComponent(2, *disc1);
+
+
+  // Compute
   modAnalysis->solve();
 
   // Print eigenvalues and natural frequencies

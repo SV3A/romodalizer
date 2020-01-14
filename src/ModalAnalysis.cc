@@ -36,8 +36,6 @@ ModalAnalysis::~ModalAnalysis()
 }
 
 
-// Defines the local matrices for each shaft element and inserts the local
-// matrices into the global M, G, and K matrices.
 void ModalAnalysis::buildShaftMatrices(const ElementsMatrix& elements)
 {
   // Start- and end indices
@@ -133,9 +131,6 @@ void ModalAnalysis::buildShaftMatrices(const ElementsMatrix& elements)
 }
 
 
-// Buids state matrices A and B as:
-//     | omega*G -K |      | M  0 |
-// A = |    K     0 |, B = | 0  M |
 void ModalAnalysis::buildStateSpace(){
   // Temporary triplet vectors for constructing the sparse state matrices
   std::vector<Triplet> aTripList, bTripList;
@@ -159,7 +154,6 @@ void ModalAnalysis::buildStateSpace(){
 }
 
 
-// Solve the generalized EVP: A*phi_i = lambda_i*B*phi_i
 void ModalAnalysis::solve()
 {
   Eigen::VectorXcd eigVals;
@@ -190,6 +184,25 @@ void ModalAnalysis::solve()
 
   eigVals.resize(0);
   eigVects.resize(0,0);
+}
+
+
+void ModalAnalysis::addNodeComponent(size_t node, Disc& disc)
+{
+  size_t diagStart = (node-1)*4;
+
+  M(diagStart  , diagStart  ) += disc.m;
+  M(diagStart+1, diagStart+1) += disc.m;
+  M(diagStart+2, diagStart+2) += disc.iD;
+  M(diagStart+3, diagStart+3) += disc.iD;
+
+  G(diagStart+2, diagStart+3) += disc.iP;
+  G(diagStart+3, diagStart+2) += disc.iP;
+}
+
+void ModalAnalysis::addNodeComponent(size_t node, Bearing& bearing)
+{
+  K.block<4, 4>((node-1)*4, (node-1)*4) += bearing.localK;
 }
 
 
