@@ -1,8 +1,10 @@
 #include <iostream>
+#include "Util.h"
 #include "Mesh.h"
 #include "ModalAnalysis.h"
-#include "Eigen/Dense"
 #include "NodeComponents.h"
+#include "Eigen/Dense"
+
 
 int main(int argc, char *argv[])
 {
@@ -42,18 +44,9 @@ int main(int argc, char *argv[])
   // Compute
   modAnalysis->solve();
 
-  // Print eigenvalues and natural frequencies
-  std::vector<EigTuple>* eigSol = modAnalysis->eigenSolution;
-
-  //std::cout << "Eigenvalues:" << std::endl;
-  //for (auto const & i:*eigSol){
-    //printf("\t%.9f\n", imag(std::get<0>(i)));
-  //}
-
-  std::cout << "Natural frequencies:" << std::endl;
-  for (auto const & i:*eigSol){
-    printf("   %10.3f Hz\n", imag(std::get<0>(i))/2.0/M_PI);
-  }
+  // Print solution
+  util::printEigenvalues(modAnalysis->eigenSolution, "eigenvalues", 4);
+  util::printEigenvalues(modAnalysis->eigenSolution, "eigenfrequencies", 4);
 
   // Cleanup
   delete mesh;
