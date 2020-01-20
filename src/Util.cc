@@ -1,5 +1,10 @@
 #include "Util.h"
 
+// Time points used by tic/toc
+static HPTimeMark* start;
+static HPTimeMark* end;
+
+
 bool util::complexSort(std::complex<double> &a, std::complex<double> &b) {
   // If real part equal sort by imag part, else sort by real part
   if (real(a) == real(b))
@@ -42,4 +47,24 @@ void util::printEigenvalues(std::vector<EigTuple>* const eigSol,
   for (auto const& eig:eigs) {
       printf(formatSpec, eig);
   }
+}
+
+
+void util::tic(){
+  start = new HPTimeMark;
+  end   = new HPTimeMark;
+
+  *start = std::chrono::high_resolution_clock::now();
+}
+
+
+void util::toc(){
+  *end = std::chrono::high_resolution_clock::now();
+
+  std::chrono::duration<double> elapsed = *end - *start;
+
+  std::cout << "Execution time: " << elapsed.count() << " s" << std::endl;
+
+  delete start;
+  delete end;
 }
