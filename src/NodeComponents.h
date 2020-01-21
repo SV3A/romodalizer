@@ -22,6 +22,10 @@ class Bearing
     Eigen::Matrix4d localK;
 
     Bearing(Eigen::Matrix4d& k);
+
+    // Overload "operator new" so it generates 16-bytes-aligned pointers via
+    // the following Eigen macro
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 #endif
