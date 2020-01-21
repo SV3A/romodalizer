@@ -1,8 +1,10 @@
+GCC ?= 0
 DEBUG ?= 0
+
 ifeq ($(DEBUG), 1)
-	CXXFLAGS = -std=c++11 -g -Wall
+	CXXFLAGS = -std=c++11 -march=native -g -Wall
 else
-	CXXFLAGS = -std=c++11 -O3
+	CXXFLAGS = -std=c++11 -march=native -O3
 endif
 
 # Define program name, directories and objects:
@@ -14,7 +16,11 @@ OBJ = main.o ModalAnalysis.o Mesh.o Util.o NodeComponents.o
 VPATH = $(SRCDIR):$(OBJDIR)
 
 # Define compiler and suffixes
-CC = clang++
+ifeq ($(GCC), 1)
+	CC = g++
+else
+	CC = clang++
+endif
 
 # Compile rule
 .cc.o:
