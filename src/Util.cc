@@ -68,3 +68,45 @@ void util::toc(){
   delete start;
   delete end;
 }
+
+
+util::Timer::Timer() {
+  startMark = std::chrono::high_resolution_clock::now();
+}
+
+
+util::Timer::Timer(std::string name) {
+  startMark = std::chrono::high_resolution_clock::now();
+  timerName = name;
+}
+
+
+util::Timer::~Timer() {
+  stop();
+}
+
+
+void util::Timer::stop()
+{
+  auto endMark = std::chrono::high_resolution_clock::now();
+
+  // Cast to microseconds
+  auto start_us = std::chrono::time_point_cast
+    <std::chrono::microseconds>(startMark).time_since_epoch().count();
+
+  auto end_us   = std::chrono::time_point_cast
+    <std::chrono::microseconds>(endMark).time_since_epoch().count();
+
+  auto elapsed = end_us - start_us;
+
+  if (timerName.size() > 1)
+    std::cout << "Execution time (" << timerName << "): ";
+  else
+    std::cout << "Execution time: ";
+
+  if (elapsed > 1e6)      std::cout << elapsed*1e-6  << " s";
+  else if (elapsed > 1e3) std::cout << elapsed*0.001 << " ms";
+  else                    std::cout << elapsed       << " μs";
+
+  std::cout << std::endl;
+}

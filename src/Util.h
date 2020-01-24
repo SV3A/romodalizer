@@ -26,6 +26,19 @@ namespace util
   // Timing functions
   void tic();
   void toc();
+
+  // Class for scope timer
+  class Timer
+  {
+    private:
+      HPTimeMark startMark;
+      std::string timerName;
+      void stop();
+    public:
+      Timer();
+      Timer(std::string name);
+      ~Timer();
+  };
 }
 
 #endif
