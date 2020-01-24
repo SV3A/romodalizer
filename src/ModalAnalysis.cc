@@ -151,6 +151,9 @@ void ModalAnalysis::buildStateSpace(){
   // Populate sparse matrices
   A.setFromTriplets(aTripList.begin(), aTripList.end());
   B.setFromTriplets(bTripList.begin(), bTripList.end());
+
+  std::cout << "Cond(A): " << util::cond(A) << std::endl;
+  std::cout << "Cond(B): " << util::cond(B) << std::endl;
 }
 
 
@@ -171,7 +174,7 @@ void ModalAnalysis::solve()
   eigVects = ges.eigenvectors();
 
   // Collect eigen- values and vectors in global "eigenSolution" container
-  for (size_t i = 0; i < eigVals.size(); ++i) {
+  for (size_t i = 0; i < (size_t) eigVals.size(); ++i) {
     // Create tuple
     std::tuple<std::complex<double>,Eigen::VectorXcd> eigPair(eigVals[i],
                                                               eigVects.row(i));

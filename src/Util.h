@@ -6,6 +6,7 @@
 #include <complex>
 #include <chrono>
 #include "Eigen/Dense"
+#include "Eigen/Sparse"
 
 typedef std::tuple<std::complex<double>, Eigen::VectorXcd> EigTuple;
 typedef std::chrono::time_point<std::chrono::high_resolution_clock> HPTimeMark;
@@ -39,6 +40,15 @@ namespace util
       Timer(std::string name);
       ~Timer();
   };
+
+  // Calculate condition number of matrix
+  template <typename T>
+  double cond(T& A) {
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(A);
+
+    return svd.singularValues()(0) /
+           svd.singularValues()(svd.singularValues().size()-1);
+  }
 }
 
 #endif
