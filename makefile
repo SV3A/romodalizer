@@ -1,10 +1,18 @@
 GCC ?= 0
 DEBUG ?= 0
+OS := $(shell uname)
 
 ifeq ($(DEBUG), 1)
 	CXXFLAGS = -std=c++11 -march=native -g -Wall
 else
 	CXXFLAGS = -std=c++11 -march=native -O3
+endif
+
+# Mitigate "stack_not_16_byte_aligned_error" on macOS
+ifeq ($(OS), Darwin)
+ifeq ($(DEBUG), 0)
+	CXXFLAGS += -fno-stack-check
+endif
 endif
 
 # Define program name, directories and objects:
