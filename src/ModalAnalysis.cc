@@ -131,20 +131,23 @@ void ModalAnalysis::buildShaftMatrices(const ElementsMatrix& elements)
 }
 
 
-void ModalAnalysis::buildStateSpace(){
+void ModalAnalysis::buildStateSpace()
+{
   // Temporary triplet vectors for constructing the sparse state matrices
   std::vector<Triplet> aTripList, bTripList;
 
   // Build triplet lists from non-zero entries in the dense global matrices
   for (size_t i = 0; i < numDof; ++i) {
     for (size_t j = 0; j < numDof; ++j) {
-      if (M(i,j) != 0.0)  bTripList.push_back(Triplet(i, j, M(i,j)));
-      if (G(i,j) != 0.0)  aTripList.push_back(Triplet(i, j, omega*G(i,j)));
-      if (K(i,j) != 0.0) {
-        aTripList.push_back(Triplet(i       , j+numDof, -K(i,j)));
-        aTripList.push_back(Triplet(i+numDof, j       ,  K(i,j)));
-        bTripList.push_back(Triplet(i+numDof, j+numDof,  K(i,j)));
+      if (M(i,j) != 0.0) {
+        aTripList.push_back(Triplet(i       , j       , M(i,j)));
+        bTripList.push_back(Triplet(i       , j+numDof, M(i,j)));
+        bTripList.push_back(Triplet(i+numDof, j       , M(i,j)));
       }
+      if (G(i,j) != 0.0)
+        bTripList.push_back(Triplet(i+numDof, j+numDof, -omega*G(i,j)));
+      if (K(i,j) != 0.0)
+        aTripList.push_back(Triplet(i+numDof, j+numDof, -K(i,j)));
     }
   }
 
@@ -177,7 +180,7 @@ void ModalAnalysis::solve()
   for (size_t i = 0; i < (size_t) eigVals.size(); ++i) {
     // Create tuple
     std::tuple<std::complex<double>,Eigen::VectorXcd> eigPair(eigVals[i],
-                                                              eigVects.row(i));
+                                                              eigVects.col(i));
     // and append it to container
     eigenSolution->push_back(eigPair);
   }

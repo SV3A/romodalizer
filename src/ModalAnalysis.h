@@ -37,8 +37,8 @@ class ModalAnalysis
     void buildShaftMatrices(const ElementsMatrix& elements);
 
     // Buids state matrices A and B as:
-    //     | omega*G -K |      | M  0 |
-    // A = |    K     0 |, B = | 0  M |
+    //     | M  0 |      | 0     M    |
+    // A = | 0 -K |, B = | M -Omega*G |
     void buildStateSpace();
 
   public:
