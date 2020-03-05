@@ -202,7 +202,7 @@ void ModalAnalysis::addNodeComponent(size_t node, Disc& disc)
   M(diagStart+2, diagStart+2) += disc.iD;
   M(diagStart+3, diagStart+3) += disc.iD;
 
-  G(diagStart+2, diagStart+3) += disc.iP;
+  G(diagStart+2, diagStart+3) -= disc.iP;
   G(diagStart+3, diagStart+2) += disc.iP;
 }
 
